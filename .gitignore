@@ -1,0 +1,4 @@
+/drh_sota_healthbar/deploy.sh
+*.build
+*.zip
+/.idea
