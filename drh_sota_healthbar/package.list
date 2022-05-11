@@ -1,5 +1,8 @@
-drh_sota_healtbar.lua
+drh_sota_healthbar.lua
+drh_sota_healthbar
 drh_sota_healthbar/user.ini
+../drh_sota_assets
+../drh_sota_assets/adv.png
 ../drh_sota_assets/bg.png
 ../drh_sota_assets/focus.png
 ../drh_sota_assets/health.png
@@ -14,3 +17,4 @@ drh_sota_healthbar/user.ini
 ../drh_sota_assets/summonHealth.png
 ../drh_sota_assets/summonHealthDown.png
 ../drh_sota_assets/summonHealthUp.png
+

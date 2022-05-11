@@ -207,9 +207,13 @@ function ShroudOnLogout()
     updateAndSavePositions()
 end
 
---function ShroudOnDisableScript()
--- Need to find out how to destroy UI objects first.
---end
+function ShroudOnDisableScript()
+    updateAndSavePositions();
+    HEALTHBAR.ready=false;
+    for i=1,#HEALTHBAR.panelsCurrent do
+        ShroudDestroyObject(HEALTHBAR.panelsCurrent[i].id, UI.Panel);
+    end
+end
 
 -- Allows to save the current configuration/settings with "!commit" in local chat.
 function ShroudOnConsoleInput(channel, sender, message)
