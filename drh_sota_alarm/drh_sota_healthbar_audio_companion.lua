@@ -179,7 +179,7 @@ function ShroudOnUpdate()
     if activeIndex > 0 then
         local audioCurrent = HEALTHBAR_AUDIO_COMPANION.audioCurrent[activeIndex];
         local soundIndex = audioCurrent.index;
-        ShroudConsoleLog(string.format(LogPrefixInfo .. "Playing sound %s (index %s/ sound index %s) with volume %s" .. LogSuffix, audioCurrent.name, audioCurrent.index, audioCurrent.index, audioCurrent.volume));
+        ShroudConsoleLog(string.format(LogPrefixInfo .. "Playing sound %s (index %s/ sound index %s) with volume %s" .. LogSuffix, audioCurrent.name, audioCurrent.index, soundIndex, audioCurrent.volume));
         local channel = ShroudPlaySound(soundIndex, audioCurrent.volume);
         ShroudConsoleLog(string.format(LogPrefixInfo .. "on channel %s" .. LogSuffix, channel));
         audioCurrent.channel = channel;
