@@ -1,4 +1,5 @@
 local DEBUG = false;
+local INDEX_ADJUSTMENT = -1;
 
 local LOW_HEALTH_FACTOR = 0.33;
 local LOW_FOCUS_FACTOR = 0.33;
@@ -46,6 +47,12 @@ local LogSuffix = "[-]"
 local timestampLowHealthState;
 local timestampLowFocusState;
 local activeIndex = -1;
+local init = false;
+local elapsedTime = 0;
+local healthFactor = 0;
+local focusFactor = 0;
+local lowHealthSound;
+local lowFocusSound;
 
 -- Executed when SOTA Lua scripting is started
 function ShroudOnStart()
@@ -67,12 +74,10 @@ end
 
 function ShroudOnSceneUnloaded()
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Scene unloading..." .. LogSuffix));
-    updateAndSavePositions()
 end
 
 function ShroudOnLogout()
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Logout..." .. LogSuffix));
-    updateAndSavePositions()
 end
 
 function ShroudOnDisableScript()
@@ -112,7 +117,15 @@ function checkForSoundsLoaded()
         HEALTHBAR_AUDIO_COMPANION.soundsLoaded = true;
     end
 end
+
 function ShroudOnUpdate()
+    if not init then
+        if not ShroudServerTime then
+            return
+        end
+        init = true;
+    end
+
     if not HEALTHBAR_AUDIO_COMPANION.ready then
         return;
     end
@@ -122,19 +135,11 @@ function ShroudOnUpdate()
         return;
     end
 
-
     lowFocusSound = HEALTHBAR_AUDIO_COMPANION.audioCurrent[SOUND_LOW_FOCUS];
     lowHealthSound = HEALTHBAR_AUDIO_COMPANION.audioCurrent[SOUND_LOW_HEALTH];
 
-    --local playerHealth = ShroudPlayerCurrentHealth;
-    --local playerFocus = ShroudPlayerCurrentFocus;
-    local playerHealth = ShroudGetStatValueByNumber(14);
-    local playerMaxHealth = ShroudGetStatValueByNumber(30);
-    local playerFocus = ShroudGetStatValueByNumber(13)
-    local playerMaxFocus = ShroudGetStatValueByNumber(27);
-
-    healthFactor = playerHealth / playerMaxHealth;
-    focusFactor = playerFocus / playerMaxFocus;
+    healthFactor = ShroudGetStatValueByNumber(14) / ShroudGetStatValueByNumber(30);
+    focusFactor = ShroudGetStatValueByNumber(13) / ShroudGetStatValueByNumber(27);
 
     if healthFactor < LOW_HEALTH_FACTOR and not HEALTHBAR_AUDIO_COMPANION.lowHealthState == true then
         HEALTHBAR_AUDIO_COMPANION.lowHealthState = true
@@ -153,35 +158,32 @@ function ShroudOnUpdate()
     local now = ShroudTime * 1000;
 
     activeIndex = -1;
-
-    if HEALTHBAR_AUDIO_COMPANION.lowHealthState then
-        local elapsedTime = now - timestampLowHealthState;
-
-        if elapsedTime > REPEAT_INTERVAL_MS then
-            ShroudConsoleLog(string.format(LogPrefixInfo .. "Triggering on Low Health: %s" .. LogSuffix, healthFactor));
-            timestampLowHealthState = now;
-            activeIndex = SOUND_LOW_HEALTH;
-        end
-    end
+    elapsedTime = 0;
 
     if HEALTHBAR_AUDIO_COMPANION.lowFocusState then
-        local elapsedTime = now - timestampLowFocusState;
+        elapsedTime = now - timestampLowFocusState;
 
         if elapsedTime > REPEAT_INTERVAL_MS then
-            ShroudConsoleLog(string.format(LogPrefixInfo .. "Triggering on Low Focus: %s" .. LogSuffix, focusFactor));
+            ShroudConsoleLog(string.format(LogPrefixInfo .. "You are low on focus! (%.2f %% < %.2f %%)" .. LogSuffix, focusFactor * 100, LOW_FOCUS_FACTOR * 100));
             timestampLowFocusState = now;
             activeIndex = SOUND_LOW_FOCUS;
         end
     end
 
+    if HEALTHBAR_AUDIO_COMPANION.lowHealthState then
+        elapsedTime = now - timestampLowHealthState;
 
+        if elapsedTime > REPEAT_INTERVAL_MS then
+            ShroudConsoleLog(string.format(LogPrefixInfo .. "Your health is low! (%.2f %% < %.2f %%)" .. LogSuffix, healthFactor * 100, LOW_HEALTH_FACTOR * 100));
+            timestampLowHealthState = now;
+            activeIndex = SOUND_LOW_HEALTH;
+        end
+    end
 
     if activeIndex > 0 then
         local audioCurrent = HEALTHBAR_AUDIO_COMPANION.audioCurrent[activeIndex];
         local soundIndex = audioCurrent.index;
-        ShroudConsoleLog(string.format(LogPrefixInfo .. "Playing sound %s (index %s/ sound index %s) with volume %s" .. LogSuffix, audioCurrent.name, audioCurrent.index, soundIndex, audioCurrent.volume));
-        local channel = ShroudPlaySound(soundIndex, audioCurrent.volume);
-        ShroudConsoleLog(string.format(LogPrefixInfo .. "on channel %s" .. LogSuffix, channel));
+        local channel = ShroudPlaySound(soundIndex + INDEX_ADJUSTMENT, audioCurrent.volume);
         audioCurrent.channel = channel;
     end
 

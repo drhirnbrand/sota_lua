@@ -17,13 +17,27 @@ local INDEX_TITLE = { panel = 1, text = 5 };
 local INDEX_PLAYER_HEALTH = { panel = 2, bar = 2, down = 3, up = 4, text = 2, tx_bg = 1, tx = 2, tx_up = 3, tx_down = 4 };
 local INDEX_PLAYER_FOCUS = { panel = 3, bar = 5, down = 6, up = 7, text = 3, tx_bg = 1, tx = 5, tx_up = 6, tx_down = 7 };
 local INDEX_SUMMON_HEALTH = { panel = 4, bar = 8, down = 9, up = 10, text = 4, tx_bg = 1, tx = 8, tx_up = 9, tx_down = 10 };
+local VERTICAL_SPACING = 16;
 
+local now = 0;
+local elapsedTime = 0;
 local timestamp = 0;
-local verticalSpacing = 16;
+local delta = 0;
+
+local init = false;
 
 local playerHealthPrevious = 0;
 local playerFocusPrevious = 0;
 local summonHealthPrevious = 0;
+
+local summonHealth = 0;
+local summonMaxHealth = 0;
+local playerHealth = 0;
+local playerMaxHealth = 0;
+local playerFocus = 0;
+local playerMaxFocus = 0;
+
+local summonPercentage = 0;
 
 local LogPrefixInfo = "[0000ff]drh_sota_healthbar: "
 local LogPrefixWarn = "[ff0000]drh_sota_healthbar: "
@@ -101,8 +115,8 @@ function ShroudOnStart()
     -- Create the main panel
     mainPanel.x = HEALTHBAR.panelXPosPercent * screenWidth / 100000;
     mainPanel.y = HEALTHBAR.panelYPosPercent * screenHeight / 100000;
-    mainPanel.w = verticalSpacing * 12;
-    mainPanel.h = verticalSpacing * 4;
+    mainPanel.w = VERTICAL_SPACING * 12;
+    mainPanel.h = VERTICAL_SPACING * 4;
 
     mainPanel.id = ShroudUIPanel(mainPanel.x, mainPanel.y, mainPanel.w, mainPanel.h);
     ShroudSetColor(mainPanel.id, UI.Panel, mainPanelSpec.bgColor);
@@ -118,7 +132,6 @@ function ShroudOnStart()
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Started!" .. LogSuffix))
 
     HEALTHBAR.ready = true;
-
 end
 
 function prepareTitle()
@@ -130,7 +143,7 @@ function prepareTitle()
     HEALTHBAR.textsCurrent[INDEX_TITLE.text] = titleText;
 
     titleText.w = mainPanel.w - (titleBorder * 2);
-    titleText.h = verticalSpacing;
+    titleText.h = VERTICAL_SPACING;
     titleText.x = titleBorder;
     titleText.y = 0;
     titleText.id = ShroudUIText(titleTextSpec.text, titleTextSpec.fontSize, titleText.x, titleText.y, titleText.w, titleText.h, mainPanel.id, UI.Panel);
@@ -149,9 +162,9 @@ function preparePanel(index, row)
     HEALTHBAR.panelsCurrent[index.panel] = panel;
 
     panel.w = mainPanel.w;
-    panel.h = verticalSpacing - (2 * panelSpec.border);
+    panel.h = VERTICAL_SPACING - (2 * panelSpec.border);
     panel.x = 0;
-    panel.y = (verticalSpacing * row) + panelSpec.border;
+    panel.y = (VERTICAL_SPACING * row) + panelSpec.border;
     panel.id = ShroudUIPanel(panel.x, panel.y, panel.w, panel.h, HEALTHBAR.texturesCurrent[index.tx_bg].id, mainPanel.id, UI.Panel);
     ShroudUnsetDragguable(panel.id, UI.Panel)
     ShroudSetColor(panel.id, UI.Panel, panelSpec.bgColor);
@@ -208,9 +221,10 @@ function ShroudOnLogout()
 end
 
 function ShroudOnDisableScript()
+    HEALTHBAR.ready = false;
+
     updateAndSavePositions();
-    HEALTHBAR.ready=false;
-    for i=1,#HEALTHBAR.panelsCurrent do
+    for i = 1, #HEALTHBAR.panelsCurrent do
         ShroudDestroyObject(HEALTHBAR.panelsCurrent[i].id, UI.Panel);
     end
 end
@@ -228,9 +242,15 @@ function ShroudOnUpdate()
     if not HEALTHBAR.ready then
         return
     end
+    if not init then
+        if not ShroudServerTime then
+            return
+        end
+        init = true;
+    end
 
-    local now = ShroudTime * 1000;
-    local elapsedTime = now - timestamp;
+    now = ShroudTime * 1000;
+    elapsedTime = now - timestamp;
 
     if (elapsedTime) < updateMinimumInMs then
         return
@@ -241,8 +261,8 @@ function ShroudOnUpdate()
     --
     -- Update the health bars
     --
-    local summonHealth = 0;
-    local summonMaxHealth = 0;
+    summonHealth = 0;
+    summonMaxHealth = 0;
     summonPercentage = 1.0;
 
     if ShroudGetPetInfo() then
@@ -254,13 +274,10 @@ function ShroudOnUpdate()
         updateBar(INDEX_SUMMON_HEALTH, 0, 0, 0);
     end
 
-
-    --local playerHealth = ShroudPlayerCurrentHealth;
-    --local playerFocus = ShroudPlayerCurrentFocus;
-    local playerHealth = ShroudGetStatValueByNumber(14);
-    local playerMaxHealth = ShroudGetStatValueByNumber(30);
-    local playerFocus = ShroudGetStatValueByNumber(13)
-    local playerMaxFocus = ShroudGetStatValueByNumber(27);
+    playerHealth = ShroudGetStatValueByNumber(14);
+    playerMaxHealth = ShroudGetStatValueByNumber(30);
+    playerFocus = ShroudGetStatValueByNumber(13)
+    playerMaxFocus = ShroudGetStatValueByNumber(27);
 
     updateBar(INDEX_PLAYER_HEALTH, playerHealth, playerHealthPrevious, playerMaxHealth);
     updateBar(INDEX_PLAYER_FOCUS, playerFocus, playerFocusPrevious, playerMaxFocus);
