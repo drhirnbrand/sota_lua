@@ -10,7 +10,7 @@ local ScriptName = "DRH Health Bar";
 local Version = "%%%VERSION%%%";
 local CreatorName = "Doktor Hirnbrand";
 local Description = "A simple moveable health/focus and pet/summon health bar";
-local IconPath = "drh_assets/healthbar_icon.png";
+local IconPath = "drh_sota_assets/healthbar_icon.png";
 
 local INDEX_MAIN = { panel = 1 };
 local INDEX_TITLE = { panel = 1, text = 5 };
@@ -55,16 +55,16 @@ local HEALTHBAR = HEALTHBAR or {
         { desc = "Summon Health", border = 2, bgColor = "#000000", transparency = 0.8 }
     };
 
-    texturesSpec = { { name = "Background", filename = 'drh_assets/bg.png' },
-                     { name = "Player Health", filename = 'drh_assets/playerHealth.png' },
-                     { name = "Player Health Up", filename = 'drh_assets/playerHealthUp.png' },
-                     { name = "Player Health Down", filename = 'drh_assets/playerHealthDown.png' },
-                     { name = "Player Focus", filename = 'drh_assets/playerFocus.png' },
-                     { name = "Player Focus Up", filename = 'drh_assets/playerFocusUp.png' },
-                     { name = "Player Focus Down", filename = 'drh_assets/playerFocusDown.png' },
-                     { name = "Summon Health", filename = 'drh_assets/summonHealth.png' },
-                     { name = "Summon Health Up", filename = 'drh_assets/summonHealthUp.png' },
-                     { name = "Summon Health Down", filename = 'drh_assets/summonHealthDown.png' }
+    texturesSpec = { { name = "Background", filename = 'drh_sota_assets/bg.png' },
+                     { name = "Player Health", filename = 'drh_sota_assets/playerHealth.png' },
+                     { name = "Player Health Up", filename = 'drh_sota_assets/playerHealthUp.png' },
+                     { name = "Player Health Down", filename = 'drh_sota_assets/playerHealthDown.png' },
+                     { name = "Player Focus", filename = 'drh_sota_assets/playerFocus.png' },
+                     { name = "Player Focus Up", filename = 'drh_sota_assets/playerFocusUp.png' },
+                     { name = "Player Focus Down", filename = 'drh_sota_assets/playerFocusDown.png' },
+                     { name = "Summon Health", filename = 'drh_sota_assets/summonHealth.png' },
+                     { name = "Summon Health Up", filename = 'drh_sota_assets/summonHealthUp.png' },
+                     { name = "Summon Health Down", filename = 'drh_sota_assets/summonHealthDown.png' }
     };
 
     textsSpec = {

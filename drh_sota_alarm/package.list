@@ -4,4 +4,5 @@ drh_sota_alarm/user.ini
 ../drh_sota_assets
 ../drh_sota_assets/low_focus.wav
 ../drh_sota_assets/low_health.wav
+../drh_sota_assets/healthbar_audio_icon.png
 

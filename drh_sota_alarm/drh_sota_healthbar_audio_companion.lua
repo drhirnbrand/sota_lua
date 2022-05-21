@@ -16,8 +16,8 @@ local REPEAT_INTERVAL_MS = 5000;
 local HEALTHBAR_AUDIO_COMPANION = HEALTHBAR_AUDIO_COMPANION or {
     -- Audio-Files
     audioSpec = {
-        { filename = "drh_assets/low_health.wav", name = "low_health" },
-        { filename = "drh_assets/low_focus.wav", name = "low_focus" };
+        { filename = "drh_sota_assets/low_health.wav", name = "low_health" },
+        { filename = "drh_sota_assets/low_focus.wav", name = "low_focus" };
     };
 
     channelsCurrent = {};
@@ -34,7 +34,7 @@ local ScriptName = "DRH Audio Companion";
 local Version = "%%%VERSION%%%";
 local CreatorName = "Doktor Hirnbrand";
 local Description = "Audible warning healthbar companion script";
-local IconPath = "drh_assets/healthbar_audio_icon.png";
+local IconPath = "drh_sota_assets/healthbar_audio_icon.png";
 
 local SOUND_LOW_HEALTH = 1;
 local SOUND_LOW_FOCUS = 2;
@@ -46,9 +46,12 @@ local LogSuffix = "[-]"
 
 local timestampLowHealthState;
 local timestampLowFocusState;
+local now;
+
 local activeIndex = -1;
 local init = false;
 local elapsedTime = 0;
+
 local healthFactor = 0;
 local focusFactor = 0;
 local lowHealthSound;
@@ -65,9 +68,8 @@ function ShroudOnStart()
 
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Started!" .. LogSuffix))
 
-    local now = ShroudTime * 1000;
-    timestampLowFocusState = now;
-    timestampLowHealthState = now;
+    timestampLowFocusState = 0;
+    timestampLowHealthState = 0;
 
     HEALTHBAR_AUDIO_COMPANION.ready = true;
 end
@@ -135,6 +137,10 @@ function ShroudOnUpdate()
         return;
     end
 
+    if not ShroudGetPlayerCombatMode() then
+        return;
+    end
+
     lowFocusSound = HEALTHBAR_AUDIO_COMPANION.audioCurrent[SOUND_LOW_FOCUS];
     lowHealthSound = HEALTHBAR_AUDIO_COMPANION.audioCurrent[SOUND_LOW_HEALTH];
 
@@ -155,7 +161,7 @@ function ShroudOnUpdate()
         HEALTHBAR_AUDIO_COMPANION.lowFocusState = false;
     end
 
-    local now = ShroudTime * 1000;
+    now = ShroudTime * 1000;
 
     activeIndex = -1;
     elapsedTime = 0;
