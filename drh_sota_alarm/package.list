@@ -1,6 +1,6 @@
-drh_sota_healthbar_audio_companion.lua
-drh_sota_alarm
-drh_sota_alarm/user.ini
+drh_sota_audio_alarm.lua
+drh_sota_audio_alarm
+drh_sota_audio_alarm/user.ini
 ../drh_sota_assets
 ../drh_sota_assets/low_focus.wav
 ../drh_sota_assets/low_health.wav

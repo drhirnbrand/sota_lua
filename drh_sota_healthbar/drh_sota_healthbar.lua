@@ -232,21 +232,21 @@ end
 -- Allows to save the current configuration/settings with "!commit" in local chat.
 function ShroudOnConsoleInput(channel, sender, message)
     if ShroudGetPlayerName() == sender and channel == 'Local' then
-        if message:sub(-#'!commit') then
+        if string.find(message,'!commit') then
             updateAndSavePositions()
         end
     end
 end
 
 function ShroudOnUpdate()
-    if not HEALTHBAR.ready then
-        return
-    end
     if not init then
         if not ShroudServerTime then
             return
         end
         init = true;
+    end
+    if not HEALTHBAR.ready then
+        return
     end
 
     now = ShroudTime * 1000;

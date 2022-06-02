@@ -1,1 +1,1 @@
-LUA Script - Show a moveable health and focus bar
+LUA Script - Play alarm sound when focus/health too low.

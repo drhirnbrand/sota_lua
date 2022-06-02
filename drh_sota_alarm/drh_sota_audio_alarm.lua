@@ -1,30 +1,42 @@
+---@type boolean
 local DEBUG = false;
-local INDEX_ADJUSTMENT = -1;
 
+---@type number
 local LOW_HEALTH_FACTOR = 0.33;
+---@type number
 local LOW_FOCUS_FACTOR = 0.33;
+---@type number
 local HIGH_HEALTH_FACTOR = 0.5
+---@type number
 local HIGH_FOCUS_FACTOR = 0.5;
 
+---@type number
 local LOW_HEALTH_VOLUME = 80;
+---@type number
 local LOW_FOCUS_VOLUME = 80;
 
-local REPEAT_INTERVAL_MS = 5000;
+---@type number
+local REPEAT_INTERVAL_MS = 6500;
 
 --- This is a structure that stores the main information objects
 ---
 local HEALTHBAR_AUDIO_COMPANION = HEALTHBAR_AUDIO_COMPANION or {
-    -- Audio-Files
+
+    ---@type table
     audioSpec = {
         { filename = "drh_sota_assets/low_health.wav", name = "low_health" },
         { filename = "drh_sota_assets/low_focus.wav", name = "low_focus" };
     };
 
+    ---@type table
     channelsCurrent = {};
 
+    ---@type table
     audioCurrent = {};
 
+    ---@type boolean
     ready = false;
+    ---@type boolean
     soundsLoaded = false;
 }
 
@@ -36,25 +48,41 @@ local CreatorName = "Doktor Hirnbrand";
 local Description = "Audible warning healthbar companion script";
 local IconPath = "drh_sota_assets/healthbar_audio_icon.png";
 
+---@type number
 local SOUND_LOW_HEALTH = 1;
+---@type number
 local SOUND_LOW_FOCUS = 2;
 
+---@type string
 local LogPrefixInfo = "[0000ff]drh_sota_healthbar_audio_companion: "
+---@type string
 local LogPrefixWarn = "[ff0000]drh_sota_healthbar_audio_companion:: "
+---@type string
 local LogPrefixDebug = "[ff0000]DEBUG drh_sota_healthbar_audio_companion: "
+---@type string
 local LogSuffix = "[-]"
 
+---@type number
 local timestampLowHealthState;
+---@type number
 local timestampLowFocusState;
+---@type number
 local now;
 
+---@type number
 local activeIndex = -1;
+---@type boolean
 local init = false;
+---@type number
 local elapsedTime = 0;
 
+---@type number
 local healthFactor = 0;
+---@type number
 local focusFactor = 0;
+---@type number
 local lowHealthSound;
+---@type number
 local lowFocusSound;
 
 -- Executed when SOTA Lua scripting is started
@@ -170,7 +198,6 @@ function ShroudOnUpdate()
         elapsedTime = now - timestampLowFocusState;
 
         if elapsedTime > REPEAT_INTERVAL_MS then
-            ShroudConsoleLog(string.format(LogPrefixInfo .. "You are low on focus! (%.2f %% < %.2f %%)" .. LogSuffix, focusFactor * 100, LOW_FOCUS_FACTOR * 100));
             timestampLowFocusState = now;
             activeIndex = SOUND_LOW_FOCUS;
         end
@@ -180,7 +207,6 @@ function ShroudOnUpdate()
         elapsedTime = now - timestampLowHealthState;
 
         if elapsedTime > REPEAT_INTERVAL_MS then
-            ShroudConsoleLog(string.format(LogPrefixInfo .. "Your health is low! (%.2f %% < %.2f %%)" .. LogSuffix, healthFactor * 100, LOW_HEALTH_FACTOR * 100));
             timestampLowHealthState = now;
             activeIndex = SOUND_LOW_HEALTH;
         end
@@ -189,7 +215,7 @@ function ShroudOnUpdate()
     if activeIndex > 0 then
         local audioCurrent = HEALTHBAR_AUDIO_COMPANION.audioCurrent[activeIndex];
         local soundIndex = audioCurrent.index;
-        local channel = ShroudPlaySound(soundIndex + INDEX_ADJUSTMENT, audioCurrent.volume);
+        local channel = ShroudPlaySound(soundIndex, audioCurrent.volume);
         audioCurrent.channel = channel;
     end
 
