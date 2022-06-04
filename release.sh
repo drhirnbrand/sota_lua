@@ -24,8 +24,7 @@ else
 fi
 
 
-#tag=`date +%Y%m%dT%H%M`
-tag="test-0.0.1"
+tag=`date +%Y%m%dT%H%M`
 
 echo "Release Tag: ${tag}"
 
