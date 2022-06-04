@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$(git symbolic-ref --short HEAD)" != "master" ]; then
+	echo "Must be on master branch!"
+	exit 1
+fi
+
 ./package.sh
 
 source .local
@@ -35,8 +40,9 @@ if [ "${retval}" != "0" ]; then
   exit 1
 fi
 
-#git tag ${tag}
-#git push --tags
+git tag ${tag}
+git push
+git push --tags
 
 for zipfile in ${zipfiles}; do
   echo "$(dirname $(dirname ${zipfile}))"
