@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./package.sh
+
 source .local
 
 PATH=/cygdrive/e/github-cli/:$PATH
@@ -30,7 +32,7 @@ git diff-index --quiet HEAD; retval=$?
 
 if [ "${retval}" != "0" ]; then
   echo "Uncommited changes in repository!"
-#  exit 1
+  exit 1
 fi
 
 #git tag ${tag}
