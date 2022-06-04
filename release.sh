@@ -13,7 +13,12 @@ zipfiles=`find -name "*.zip"`
 
 echo -e "Zip Files:\n${zipfiles}"
 
-git status || exit 1
+git diff-index --quiet HEAD; retval=?
+
+if [ "${retval}" != "0" ]; then
+  echo "Uncommited changes in repository!"
+  exit 1
+fi
 
 exit 0
 
