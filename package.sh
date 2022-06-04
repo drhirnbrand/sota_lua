@@ -21,9 +21,8 @@ function package() {
   dir=build/${PACKAGE}-${VERSION}
   zip=build/${PACKAGE}-${VERSION}.zip
 
-  rm -vf ${zip}
 
-  rm -rf ${dir}
+  rm -v -rf build
   mkdir -v -p ${dir}
 
   for file in `cat package.list`; do
@@ -47,7 +46,14 @@ function package() {
     sed -i s@%%%VERSION%%%@${VERSION}@ ${script}
   done
 
-  zip -u -r ${zip} ${dir}
+  # Create zip, get full path, remove, then final package
+  touch ${zip}
+  zipfullname="$(readlink -f ${zip})"
+  rm -f ${zip}
+
+  (
+    cd ${dir} && zip -v -u -r ${zipfullname} ./*
+  )
 }
 
 find -type d -maxdepth 1 -name "*drh_sota_*" | {
