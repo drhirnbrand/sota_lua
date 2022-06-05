@@ -39,15 +39,18 @@ if [ "${retval}" != "0" ]; then
   exit 1
 fi
 
-git tag ${tag}
-git push
-git push --tags
+git tag ${tag} && git push && git push --tags; retval=$?
+
+if [ "${retval}" != "0" ]; then
+  echo "Pushing latest changes and tags failed!"
+  exit 1
+fi
 
 for zipfile in ${zipfiles}; do
   echo "$(dirname $(dirname ${zipfile}))"
 done
 
 echo -e "Performing release"
-gh release create ${tag} --draft ${zipfiles}
+gh release create ${tag} ${zipfiles}
 
 
