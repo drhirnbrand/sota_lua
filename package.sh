@@ -46,6 +46,8 @@ function package() {
     sed -i s@%%%VERSION%%%@${VERSION}@ ${script}
   done
 
+  cp -v drh_sota_library/drh_sota_library.lua ${dir}
+
   # Create zip, get full path, remove, then final package
   touch ${zip}
   zipfullname="$(readlink -f ${zip})"
