@@ -49,48 +49,48 @@ local LogSuffix = "[-]"
 local HEALTHBAR = HEALTHBAR or {
     -- Datastructure for Panel positions, filled during startup
     panelsSpec = {
-        { desc = "Main", border = 0, bgColor = "#000000", transparency = 0.8 },
+        { desc = "Main",          border = 0, bgColor = "#000000", transparency = 0.8 },
         { desc = "Player Health", border = 2, bgColor = "#000000", transparency = 0.8 },
-        { desc = "Player Focus", border = 2, bgColor = "#000000", transparency = 0.8 },
+        { desc = "Player Focus",  border = 2, bgColor = "#000000", transparency = 0.8 },
         { desc = "Summon Health", border = 2, bgColor = "#000000", transparency = 0.8 }
-    };
+    },
 
     texturesSpec = { { name = "Background", filename = 'drh_sota_assets/bg.png' },
-                     { name = "Player Health", filename = 'drh_sota_assets/playerHealth.png' },
-                     { name = "Player Health Up", filename = 'drh_sota_assets/playerHealthUp.png' },
-                     { name = "Player Health Down", filename = 'drh_sota_assets/playerHealthDown.png' },
-                     { name = "Player Focus", filename = 'drh_sota_assets/playerFocus.png' },
-                     { name = "Player Focus Up", filename = 'drh_sota_assets/playerFocusUp.png' },
-                     { name = "Player Focus Down", filename = 'drh_sota_assets/playerFocusDown.png' },
-                     { name = "Summon Health", filename = 'drh_sota_assets/summonHealth.png' },
-                     { name = "Summon Health Up", filename = 'drh_sota_assets/summonHealthUp.png' },
-                     { name = "Summon Health Down", filename = 'drh_sota_assets/summonHealthDown.png' }
-    };
+        { name = "Player Health",      filename = 'drh_sota_assets/playerHealth.png' },
+        { name = "Player Health Up",   filename = 'drh_sota_assets/playerHealthUp.png' },
+        { name = "Player Health Down", filename = 'drh_sota_assets/playerHealthDown.png' },
+        { name = "Player Focus",       filename = 'drh_sota_assets/playerFocus.png' },
+        { name = "Player Focus Up",    filename = 'drh_sota_assets/playerFocusUp.png' },
+        { name = "Player Focus Down",  filename = 'drh_sota_assets/playerFocusDown.png' },
+        { name = "Summon Health",      filename = 'drh_sota_assets/summonHealth.png' },
+        { name = "Summon Health Up",   filename = 'drh_sota_assets/summonHealthUp.png' },
+        { name = "Summon Health Down", filename = 'drh_sota_assets/summonHealthDown.png' }
+    },
 
     textsSpec = {
-        { fontSize = 10, text = "DRH Healthbar", color = "#ffffff" },
-        { fontSize = 10, text = "0 / 0", color = "#ffffff" },
-        { fontSize = 10, text = "0 / 0", color = "#ffffff" },
-        { fontSize = 10, text = "0 / 0", color = "#ffffff" },
+        { fontSize = 10, text = "DRH Healthbar",             color = "#ffffff" },
+        { fontSize = 10, text = "0 / 0",                     color = "#ffffff" },
+        { fontSize = 10, text = "0 / 0",                     color = "#ffffff" },
+        { fontSize = 10, text = "0 / 0",                     color = "#ffffff" },
         { fontSize = 10, text = "DRH Healthbar " .. Version, color = "#8f8f8f" }
-    };
+    },
 
-    buttonsCurrent = {};
-    panelsCurrent = {};
-    texturesCurrent = {};
-    barsCurrent = {};
-    textsCurrent = {};
+    buttonsCurrent = {},
+    panelsCurrent = {},
+    texturesCurrent = {},
+    barsCurrent = {},
+    textsCurrent = {},
 
-    panelXPosPercent = 80000;
-    panelYPosPercent = 80000;
+    panelXPosPercent = 80000,
+    panelYPosPercent = 80000,
 
-    counter = 0;
+    counter = 0,
 
-    userInfo = "";
+    userInfo = "",
 
-    ready = false;
+    ready = false,
 
-    currentStats = {};
+    currentStats = {},
 }
 
 -- Executed when SOTA Lua scripting is started
@@ -146,7 +146,8 @@ function prepareTitle()
     titleText.h = VERTICAL_SPACING;
     titleText.x = titleBorder;
     titleText.y = 0;
-    titleText.id = ShroudUIText(titleTextSpec.text, titleTextSpec.fontSize, titleText.x, titleText.y, titleText.w, titleText.h, mainPanel.id, UI.Panel);
+    titleText.id = ShroudUIText(titleTextSpec.text, titleTextSpec.fontSize, titleText.x, titleText.y, titleText.w,
+        titleText.h, mainPanel.id, UI.Panel);
     ShroudSetColor(titleText.id, UI.Text, titleTextSpec.color);
     ShroudSetTextAlignment(titleText.id, TextAnchor.MiddleCenter);
 end
@@ -165,7 +166,8 @@ function preparePanel(index, row)
     panel.h = VERTICAL_SPACING - (2 * panelSpec.border);
     panel.x = 0;
     panel.y = (VERTICAL_SPACING * row) + panelSpec.border;
-    panel.id = ShroudUIPanel(panel.x, panel.y, panel.w, panel.h, HEALTHBAR.texturesCurrent[index.tx_bg].id, mainPanel.id, UI.Panel);
+    panel.id = ShroudUIPanel(panel.x, panel.y, panel.w, panel.h, HEALTHBAR.texturesCurrent[index.tx_bg].id, mainPanel.id,
+        UI.Panel);
     ShroudUnsetDragguable(panel.id, UI.Panel)
     ShroudSetColor(panel.id, UI.Panel, panelSpec.bgColor);
 
@@ -192,7 +194,8 @@ function preparePanel(index, row)
     down.h = bar.h
     down.x = bar.x + bar.w
     down.y = bar.y
-    down.id = ShroudUIImage(down.x, down.y, down.w, down.h, HEALTHBAR.texturesCurrent[index.tx_down].id, panel.id, UI.Panel);
+    down.id = ShroudUIImage(down.x, down.y, down.w, down.h, HEALTHBAR.texturesCurrent[index.tx_down].id, panel.id,
+        UI.Panel);
 
     HEALTHBAR.barsCurrent[index.bar] = bar;
     HEALTHBAR.barsCurrent[index.up] = up;
@@ -232,7 +235,7 @@ end
 -- Allows to save the current configuration/settings with "!commit" in local chat.
 function ShroudOnConsoleInput(channel, sender, message)
     if ShroudGetPlayerName() == sender and channel == 'Local' then
-        if string.find(message,'!commit') then
+        if string.find(message, '!commit') then
             updateAndSavePositions()
         end
     end
@@ -289,7 +292,6 @@ function ShroudOnUpdate()
     playerHealthPrevious = drift(playerHealth, playerHealthPrevious, delta, playerMaxHealth);
     playerFocusPrevious = drift(playerFocus, playerFocusPrevious, delta, playerMaxFocus);
     summonHealthPrevious = drift(summonHealth, summonHealthPrevious, delta, summonMaxHealth);
-
 end
 
 function drift(current, previous, delta, max)
@@ -329,7 +331,6 @@ function updateBar(index, current, previous, max)
     local difference = current - previous;
 
     if difference < 0 then
-
         bar.w = math.floor((bar.wMax * factor) + 0.5);
 
         up.w = 0;
@@ -377,7 +378,8 @@ function updateAndSavePositions()
     mainPanel.x = math.min(mainPosition.x, screenWidth - mainPanel.w);
     mainPanel.y = math.min(mainPosition.y, screenHeight - mainPanel.h);
 
-    ShroudConsoleLog(string.format(LogPrefixInfo .. "Main panel position: %s,%s" .. LogSuffix, HEALTHBAR.panelXPosPercent, HEALTHBAR.panelYPosPercent))
+    ShroudConsoleLog(string.format(LogPrefixInfo .. "Main panel position: %s,%s" .. LogSuffix, HEALTHBAR
+        .panelXPosPercent, HEALTHBAR.panelYPosPercent))
     saveSettings();
 end
 
@@ -445,8 +447,8 @@ function loadAsset(index)
         ShroudConsoleLog(string.format(LogPrefixWarn .. "'%s' not found (file: %s)!" .. LogSuffix, name, filename));
     else
         if DEBUG then
-            ShroudConsoleLog(string.format(LogPrefixDebug .. " Asset '%s' (file: %s) loaded as id %s" .. LogSuffix, name, filename, texture.id));
+            ShroudConsoleLog(string.format(LogPrefixDebug .. " Asset '%s' (file: %s) loaded as id %s" .. LogSuffix, name,
+                filename, texture.id));
         end
     end
 end
-
