@@ -21,7 +21,6 @@ function package() {
   dir=build/${PACKAGE}-${VERSION}
   zip=build/${PACKAGE}-${VERSION}.zip
 
-
   rm -v -rf build
   mkdir -v -p ${dir}
 
@@ -58,7 +57,7 @@ function package() {
   )
 }
 
-find -type d -maxdepth 1 -name "*drh_sota_*" | {
+find -maxdepth 1 -type d  -name "*drh_sota_*" | {
   while read pkg; do
     (
       cd $pkg
