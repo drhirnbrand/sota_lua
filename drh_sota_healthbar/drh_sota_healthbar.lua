@@ -1,5 +1,3 @@
-local DEBUG = false;
-
 -- These values can be changed
 local updateMinimumInMs = 20; -- the minimum number of ms between each update
 local updateDriftSpeed = 100; -- drift of health/focus per time, how fast the bar moves to the current value after a change. Large number make it move faster.
@@ -44,10 +42,12 @@ local LogPrefixWarn = "[ff0000]drh_sota_healthbar: "
 local LogPrefixDebug = "[ff0000]DEBUG drh_sota_healthbar: "
 local LogSuffix = "[-]"
 
+local minSize = VERTICAL_SPACING * 12
+local maxSize = VERTICAL_SPACING * 4
+
 --- This is a structure that stores the main information objects
----
-local HEALTHBAR = HEALTHBAR or {
-    -- Datastructure for Panel positions, filled during startup
+DRH_HEALTH_BAR = {
+    -- Data structure for Panel positions, filled during startup
     panelsSpec = {
         { desc = "Main",          border = 0, bgColor = "#000000", transparency = 0.8 },
         { desc = "Player Health", border = 2, bgColor = "#000000", transparency = 0.8 },
@@ -97,7 +97,7 @@ local HEALTHBAR = HEALTHBAR or {
 function ShroudOnStart()
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Health Monitor %s" .. LogSuffix, Version));
 
-    HEALTHBAR.userInfo = ShroudLuaPath .. '/drh_sota_healthbar/user.ini';
+    DRH_HEALTH_BAR.userInfo = ShroudLuaPath .. '/drh_sota_healthbar/user.ini';
 
     -- Restore the previously stored panel positions
     loadSettings();
@@ -107,14 +107,14 @@ function ShroudOnStart()
 
     local screenWidth = ShroudGetScreenX();
     local screenHeight = ShroudGetScreenY();
-    local mainPanelSpec = HEALTHBAR.panelsSpec[INDEX_MAIN.panel];
+    local mainPanelSpec = DRH_HEALTH_BAR.panelsSpec[INDEX_MAIN.panel];
 
     local mainPanel = {};
-    HEALTHBAR.panelsCurrent[INDEX_MAIN.panel] = mainPanel;
+    DRH_HEALTH_BAR.panelsCurrent[INDEX_MAIN.panel] = mainPanel;
 
     -- Create the main panel
-    mainPanel.x = HEALTHBAR.panelXPosPercent * screenWidth / 100000;
-    mainPanel.y = HEALTHBAR.panelYPosPercent * screenHeight / 100000;
+    mainPanel.x = DRH_HEALTH_BAR.panelXPosPercent * screenWidth / 100000;
+    mainPanel.y = DRH_HEALTH_BAR.panelYPosPercent * screenHeight / 100000;
     mainPanel.w = VERTICAL_SPACING * 12;
     mainPanel.h = VERTICAL_SPACING * 4;
 
@@ -131,16 +131,16 @@ function ShroudOnStart()
 
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Started!" .. LogSuffix))
 
-    HEALTHBAR.ready = true;
+    DRH_HEALTH_BAR.ready = true;
 end
 
 function prepareTitle()
-    local mainPanel = HEALTHBAR.panelsCurrent[INDEX_MAIN.panel];
-    local titleTextSpec = HEALTHBAR.textsSpec[INDEX_TITLE.text];
+    local mainPanel = DRH_HEALTH_BAR.panelsCurrent[INDEX_MAIN.panel];
+    local titleTextSpec = DRH_HEALTH_BAR.textsSpec[INDEX_TITLE.text];
     local titleBorder = 48
 
     local titleText = {};
-    HEALTHBAR.textsCurrent[INDEX_TITLE.text] = titleText;
+    DRH_HEALTH_BAR.textsCurrent[INDEX_TITLE.text] = titleText;
 
     titleText.w = mainPanel.w - (titleBorder * 2);
     titleText.h = VERTICAL_SPACING;
@@ -153,20 +153,20 @@ function prepareTitle()
 end
 
 function preparePanel(index, row)
-    local mainPanel = HEALTHBAR.panelsCurrent[INDEX_MAIN.panel];
+    local mainPanel = DRH_HEALTH_BAR.panelsCurrent[INDEX_MAIN.panel];
     local barBorder = 2;
 
-    local panelSpec = HEALTHBAR.panelsSpec[index.panel];
-    local textSpec = HEALTHBAR.textsSpec[index.text];
+    local panelSpec = DRH_HEALTH_BAR.panelsSpec[index.panel];
+    local textSpec = DRH_HEALTH_BAR.textsSpec[index.text];
 
     local panel = {};
-    HEALTHBAR.panelsCurrent[index.panel] = panel;
+    DRH_HEALTH_BAR.panelsCurrent[index.panel] = panel;
 
     panel.w = mainPanel.w;
     panel.h = VERTICAL_SPACING - (2 * panelSpec.border);
     panel.x = 0;
     panel.y = (VERTICAL_SPACING * row) + panelSpec.border;
-    panel.id = ShroudUIPanel(panel.x, panel.y, panel.w, panel.h, HEALTHBAR.texturesCurrent[index.tx_bg].id, mainPanel.id,
+    panel.id = ShroudUIPanel(panel.x, panel.y, panel.w, panel.h, DRH_HEALTH_BAR.texturesCurrent[index.tx_bg].id, mainPanel.id,
         UI.Panel);
     ShroudUnsetDragguable(panel.id, UI.Panel)
     ShroudSetColor(panel.id, UI.Panel, panelSpec.bgColor);
@@ -180,29 +180,29 @@ function preparePanel(index, row)
     bar.h = panel.h - (barBorder * 2);
     bar.x = barBorder;
     bar.y = barBorder;
-    bar.id = ShroudUIImage(bar.x, bar.y, bar.w, bar.h, HEALTHBAR.texturesCurrent[index.tx].id, panel.id, UI.Panel);
+    bar.id = ShroudUIImage(bar.x, bar.y, bar.w, bar.h, DRH_HEALTH_BAR.texturesCurrent[index.tx].id, panel.id, UI.Panel);
 
     up.w = 0;
     up.wMax = bar.w;
     up.h = bar.h
     up.x = bar.x + bar.w
     up.y = bar.y
-    up.id = ShroudUIImage(up.x, up.y, up.w, up.h, HEALTHBAR.texturesCurrent[index.tx_up].id, panel.id, UI.Panel);
+    up.id = ShroudUIImage(up.x, up.y, up.w, up.h, DRH_HEALTH_BAR.texturesCurrent[index.tx_up].id, panel.id, UI.Panel);
 
     down.w = 0;
     down.wMax = bar.w;
     down.h = bar.h
     down.x = bar.x + bar.w
     down.y = bar.y
-    down.id = ShroudUIImage(down.x, down.y, down.w, down.h, HEALTHBAR.texturesCurrent[index.tx_down].id, panel.id,
+    down.id = ShroudUIImage(down.x, down.y, down.w, down.h, DRH_HEALTH_BAR.texturesCurrent[index.tx_down].id, panel.id,
         UI.Panel);
 
-    HEALTHBAR.barsCurrent[index.bar] = bar;
-    HEALTHBAR.barsCurrent[index.up] = up;
-    HEALTHBAR.barsCurrent[index.down] = down;
+    DRH_HEALTH_BAR.barsCurrent[index.bar] = bar;
+    DRH_HEALTH_BAR.barsCurrent[index.up] = up;
+    DRH_HEALTH_BAR.barsCurrent[index.down] = down;
 
     local text = {};
-    HEALTHBAR.textsCurrent[index.text] = text;
+    DRH_HEALTH_BAR.textsCurrent[index.text] = text;
 
     text.w = panel.w;
     text.h = panel.h;
@@ -224,11 +224,11 @@ function ShroudOnLogout()
 end
 
 function ShroudOnDisableScript()
-    HEALTHBAR.ready = false;
+    DRH_HEALTH_BAR.ready = false;
 
     updateAndSavePositions();
-    for i = 1, #HEALTHBAR.panelsCurrent do
-        ShroudDestroyObject(HEALTHBAR.panelsCurrent[i].id, UI.Panel);
+    for i = 1, #DRH_HEALTH_BAR.panelsCurrent do
+        ShroudDestroyObject(DRH_HEALTH_BAR.panelsCurrent[i].id, UI.Panel);
     end
 end
 
@@ -248,7 +248,7 @@ function ShroudOnUpdate()
         end
         init = true;
     end
-    if not HEALTHBAR.ready then
+    if not DRH_HEALTH_BAR.ready then
         return
     end
 
@@ -313,10 +313,10 @@ function sign(number)
 end
 
 function updateBar(index, current, previous, max)
-    local text = HEALTHBAR.textsCurrent[index.text];
-    local bar = HEALTHBAR.barsCurrent[index.bar];
-    local up = HEALTHBAR.barsCurrent[index.up];
-    local down = HEALTHBAR.barsCurrent[index.down];
+    local text = DRH_HEALTH_BAR.textsCurrent[index.text];
+    local bar = DRH_HEALTH_BAR.barsCurrent[index.bar];
+    local up = DRH_HEALTH_BAR.barsCurrent[index.up];
+    local down = DRH_HEALTH_BAR.barsCurrent[index.down];
 
     --local factor = 0;
     --local factorPrevious = 0;
@@ -369,26 +369,26 @@ function updateAndSavePositions()
     ShroudConsoleLog("HM: Storing settings...");
     local screenWidth = ShroudGetScreenX();
     local screenHeight = ShroudGetScreenY();
-    local mainPanel = HEALTHBAR.panelsCurrent[INDEX_MAIN.panel];
+    local mainPanel = DRH_HEALTH_BAR.panelsCurrent[INDEX_MAIN.panel];
     local mainPosition = ShroudGetPosition(mainPanel.id, UI.Panel);
 
-    HEALTHBAR.panelXPosPercent = math.floor(mainPanel.x * 100000 / screenWidth);
-    HEALTHBAR.panelYPosPercent = math.floor(mainPanel.y * 100000 / screenHeight);
+    DRH_HEALTH_BAR.panelXPosPercent = math.floor(mainPanel.x * 100000 / screenWidth);
+    DRH_HEALTH_BAR.panelYPosPercent = math.floor(mainPanel.y * 100000 / screenHeight);
 
     mainPanel.x = math.min(mainPosition.x, screenWidth - mainPanel.w);
     mainPanel.y = math.min(mainPosition.y, screenHeight - mainPanel.h);
 
-    ShroudConsoleLog(string.format(LogPrefixInfo .. "Main panel position: %s,%s" .. LogSuffix, HEALTHBAR
-        .panelXPosPercent, HEALTHBAR.panelYPosPercent))
+    ShroudConsoleLog(string.format(LogPrefixInfo .. "Main panel position: %s,%s" .. LogSuffix, DRH_HEALTH_BAR
+        .panelXPosPercent, DRH_HEALTH_BAR.panelYPosPercent))
     saveSettings();
 end
 
 function saveSettings()
-    file = io.open(HEALTHBAR.userInfo, "w")
+    file = io.open(DRH_HEALTH_BAR.userInfo, "w")
 
     if file then
-        file:write("panelXPosPercent=" .. HEALTHBAR.panelXPosPercent .. "\n");
-        file:write("panelYPosPercent=" .. HEALTHBAR.panelYPosPercent .. "\n");
+        file:write("panelXPosPercent=" .. DRH_HEALTH_BAR.panelXPosPercent .. "\n");
+        file:write("panelYPosPercent=" .. DRH_HEALTH_BAR.panelYPosPercent .. "\n");
         file:close()
     end
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Settings saved!" .. LogSuffix));
@@ -398,7 +398,7 @@ function loadSettings()
     ShroudConsoleLog(string.format(LogPrefixInfo .. "Loading settings..." .. LogSuffix));
 
     ---- Create if not exist.
-    local file = io.open(HEALTHBAR.userInfo, "r")
+    local file = io.open(DRH_HEALTH_BAR.userInfo, "r")
 
     if file == nil then
         saveSettings()
@@ -407,15 +407,15 @@ function loadSettings()
     end
     --
     ---- Load file in key-value store
-    file = io.open(HEALTHBAR.userInfo, "r");
+    file = io.open(DRH_HEALTH_BAR.userInfo, "r");
 
     for line in file:lines() do
         local param, value = line:match('^([%w|_]+)%s-=%s-(.+)$');
         if (param and value ~= nil) then
             if param == 'panelXPosPercent' then
-                HEALTHBAR.panelXPosPercent = tonumber(value);
+                DRH_HEALTH_BAR.panelXPosPercent = tonumber(value);
             elseif param == 'panelYPosPercent' then
-                HEALTHBAR.panelYPosPercent = tonumber(value);
+                DRH_HEALTH_BAR.panelYPosPercent = tonumber(value);
             end
         end
     end
@@ -428,20 +428,20 @@ end
 -- Asset loading (Textures, Images, etc)
 --
 function loadAssets()
-    for index = 1, #HEALTHBAR.texturesSpec do
+    for index = 1, #DRH_HEALTH_BAR.texturesSpec do
         loadAsset(index);
     end
     ShroudConsoleLog(LogPrefixInfo .. " Assets loaded." .. LogSuffix)
 end
 
 function loadAsset(index)
-    local filename = HEALTHBAR.texturesSpec[index].filename;
-    local name = HEALTHBAR.texturesSpec[index].name;
+    local filename = DRH_HEALTH_BAR.texturesSpec[index].filename;
+    local name = DRH_HEALTH_BAR.texturesSpec[index].name;
     local texture = {}
 
     texture.id = ShroudLoadTexture(filename, false);
 
-    HEALTHBAR.texturesCurrent[index] = texture;
+    DRH_HEALTH_BAR.texturesCurrent[index] = texture;
 
     if texture.id == -1 then
         ShroudConsoleLog(string.format(LogPrefixWarn .. "'%s' not found (file: %s)!" .. LogSuffix, name, filename));

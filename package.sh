@@ -57,7 +57,7 @@ function package() {
   )
 }
 
-find -maxdepth 1 -type d  -name "*drh_sota_*" | {
+find -maxdepth 1 -type d -name "*drh_sota_*" | {
   while read pkg; do
     (
       cd $pkg

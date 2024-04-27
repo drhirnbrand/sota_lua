@@ -1,6 +1,3 @@
-local DEBUG = false;
-
-
 -- Do not change anything below this line
 local ScriptName = "DRH Fishing Tracker & Tool";
 local Version = "%%%VERSION%%%";
@@ -9,47 +6,49 @@ local Description = "Add-On to track fishing and help with fishing contests";
 local IconPath = "drh_sota_assets/fishing_icon.png";
 
 local DRH_FISHING = {
-    started = false;
-    userInfoPath = ShroudLuaPath .. '/drh_sota_fishing/user.ini';
+    UserInfoPath = ShroudLuaPath .. '/drh_sota_fishing/user.ini',
 
-    INDEX_MAIN = { panel = 1, texture = 1 };
-    INDEX_FISHING_TRACKER = { button = 1, texture = 2};
-    INDEX_FISHING_CONTEST = { button = 2, texture = 3};
+    started = false,
+
+    INDEX_MAIN = { panel = 1, texture = 1 },
+    INDEX_FISHING_TRACKER = { button = 1, texture = 2 },
+    INDEX_FISHING_CONTEST = { button = 2, texture = 3 },
 
     panelsSpec = {
-        { desc = "Main", border = 0, bgColor = "#000000", transparency = 0.8 },
+        { desc = "Main",            border = 0, bgColor = "#000000", transparency = 0.8 },
         { desc = "Fishing Tracker", border = 2, bgColor = "#000000", transparency = 0.8 },
         { desc = "Contest Results", border = 2, bgColor = "#000000", transparency = 0.8 },
---        { desc = "Statistics", border = 2, bgColor = "#000000", transparency = 0.8 }
-    };
+        --        { desc = "Statistics", border = 2, bgColor = "#000000", transparency = 0.8 }
+    },
 
     buttonsSpec = {
         { desc = "Fishing Tracker", border = 2, bgColor = "#000000", transparency = 0.8 },
         { desc = "Contest Results", border = 2, bgColor = "#000000", transparency = 0.8 },
-    };
+    },
 
-    texturesSpec = { { name = "Background", filename = 'drh_sota_assets/bg.png' },
-                     { name = "Fishing Pole", filename = 'drh_sota_assets/fishing_pole.png' },
-                     { name = "Fishing Contest", filename = 'drh_sota_assets/fishing_contest.png' }
-    };
+    texturesSpec = {
+        { name = "Background",      filename = 'drh_sota_assets/bg.png' },
+        { name = "Fishing Pole",    filename = 'drh_sota_assets/fishing_pole.png' },
+        { name = "Fishing Contest", filename = 'drh_sota_assets/fishing_contest.png' }
+    },
 
     textsSpec = {
-        { fontSize = 10, text = "DRH Healthbar", color = "#ffffff" },
-        { fontSize = 10, text = "0 / 0", color = "#ffffff" },
-        { fontSize = 10, text = "0 / 0", color = "#ffffff" },
-        { fontSize = 10, text = "0 / 0", color = "#ffffff" },
+        { fontSize = 10, text = "DRH Healthbar",             color = "#ffffff" },
+        { fontSize = 10, text = "0 / 0",                     color = "#ffffff" },
+        { fontSize = 10, text = "0 / 0",                     color = "#ffffff" },
+        { fontSize = 10, text = "0 / 0",                     color = "#ffffff" },
         { fontSize = 10, text = "DRH Healthbar " .. Version, color = "#8f8f8f" }
-    };
+    },
 
-    panelsCurrent = {};
-    texturesCurrent = {};
-    buttonsCurrent = {};
-    textsCurrent = {};
+    panelsCurrent = {},
+    texturesCurrent = {},
+    buttonsCurrent = {},
+    textsCurrent = {},
 
-    panelXPosPercent = 0;
-    panelYPosPercent = 60000;
+    panelXPosPercent = 0,
+    panelYPosPercent = 0,
 
-    fishingPanel;
+    fishingPanel,
 
     --
     --
@@ -70,16 +69,10 @@ local DRH_FISHING = {
         ShroudSetTransparency(fishingPanel.id, UI.Panel, fishingPanelSpec.transparency);
 
         panelsCurrent[INDEX_MAIN.panel] = fishingPanel;
-        
+
         return mainPanel;
     end
 }
-
----@type number
-local screenWidth;
-
----@type number
-local screenHeight;
 
 -- Executed when SOTA Lua scripting is started
 function ShroudOnStart()
@@ -93,6 +86,3 @@ function ShroudOnStart()
 
     DRH_FISHING.started = true;
 end
-
-
-

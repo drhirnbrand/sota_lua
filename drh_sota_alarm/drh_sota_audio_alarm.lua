@@ -25,19 +25,19 @@ local HEALTHBAR_AUDIO_COMPANION = HEALTHBAR_AUDIO_COMPANION or {
     ---@type table
     audioSpec = {
         { filename = "drh_sota_assets/low_health.wav", name = "low_health" },
-        { filename = "drh_sota_assets/low_focus.wav", name = "low_focus" };
-    };
+        { filename = "drh_sota_assets/low_focus.wav",  name = "low_focus" },
+    },
 
     ---@type table
-    channelsCurrent = {};
+    channelsCurrent = {},
 
     ---@type table
-    audioCurrent = {};
+    audioCurrent = {},
 
     ---@type boolean
-    ready = false;
+    ready = false,
     ---@type boolean
-    soundsLoaded = false;
+    soundsLoaded = false,
 }
 
 -- Do not change anything below this line
@@ -143,7 +143,8 @@ function checkForSoundsLoaded()
     end
 
     if #HEALTHBAR_AUDIO_COMPANION.audioCurrent == #HEALTHBAR_AUDIO_COMPANION.audioSpec then
-        ShroudConsoleLog(string.format(LogPrefixInfo .. "Sounds loaded: %s Asset(s) ready." .. LogSuffix, #HEALTHBAR_AUDIO_COMPANION.audioCurrent))
+        ShroudConsoleLog(string.format(LogPrefixInfo .. "Sounds loaded: %s Asset(s) ready." .. LogSuffix,
+            #HEALTHBAR_AUDIO_COMPANION.audioCurrent))
         HEALTHBAR_AUDIO_COMPANION.soundsLoaded = true;
     end
 end
@@ -218,10 +219,7 @@ function ShroudOnUpdate()
         local channel = ShroudPlaySound(soundIndex, audioCurrent.volume);
         audioCurrent.channel = channel;
     end
-
 end
-
-
 
 --
 -- Asset loading (Textures, Images, etc)
@@ -246,4 +244,3 @@ function loadAudioAsset(index)
         ShroudConsoleLog(string.format(LogPrefixDebug .. "Sound '%s' (file: %s) loaded." .. LogSuffix, name, filename));
     end
 end
-
