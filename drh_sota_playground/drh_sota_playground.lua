@@ -50,8 +50,8 @@ function ShroudOnStart()
     _Started = true
     _Halted = false
 
-    create_text_area_1()
-    show_text_area_1()
+    --- create_text_area_1()
+    --- show_text_area_1()
 end
 
 function ShroudOnDisableScript()
@@ -305,10 +305,15 @@ end
 --end
 --
 function ShroudOnMouseOut(objectID, objectKind)
+    if true then
+        return
+    end
+
     DRH.infoMessage(ScriptName, string.format("MouseOut: %s - %s", tostring(objectID), tostring(objectKind)));
     --to know when mouse has left the object
 
     local buff_count = ShroudGetBuffCount()
+
     for i = 1, buff_count do
         local buff_name = ShroudGetBuffName(i)
         local buff_remaining = ShroudGetBuffTimeRemaining(i)

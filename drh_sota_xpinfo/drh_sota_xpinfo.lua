@@ -36,9 +36,12 @@ DRH_XP_INFO = {
 
     xp_info_specs = {
 
-        assets = { { name = "Background", path = "drh_sota_assets/bg.png", clamp = false } },
+        assets = { { name = "Background", path = "drh_sota_assets/bg.png",  clamp = false },
+            { name = "Title Background", path = "drh_sota_assets/bg_title.png", clamp = false }, },
 
-        textures = { { asset_index = 1, x = 0, y = 0, w = 60 * 6, h = 16 * 3 } },
+        textures = { { asset_index = 1, x = 0, y = 0, w = 1, h = 1 },
+            { asset_index = 2, x = 0, y = 0, w = 1, h = 1 }, },
+
         images = {},
 
         panels = {
@@ -46,9 +49,26 @@ DRH_XP_INFO = {
                 name = "XP",
                 x = 0,
                 y = 0,
-                w = 60 * 6,
-                h = 16 * 3,
-                texture_index = 1
+                w = 60 * 3,
+                h = 16 * 4,
+                w_max = 60 * 5,
+                h_max = 16 * 8,
+                texture_index = 1,
+                resizable = true,
+                children = { 2 }
+            },
+            {
+                name = "XP_Title",
+                x = 0,
+                y = 0,
+                w = 1,
+                h = 16,
+                texture_index = 2,
+                anchor_min_x = 0.0,
+                anchor_min_y = 0.0,
+                anchor_max_x = 1.0,
+                anchor_max_y = 0.0,
+                raycast = false
             },
             {
                 name = "Window_Buttons",
@@ -56,13 +76,13 @@ DRH_XP_INFO = {
                 y = 0,
                 w = 3 * 16,
                 h = 1 * 16,
-                anchor_min_x = 1.0,
-                anchor_min_y = 1.0,
+                anchor_min_x = 0.0,
+                anchor_min_y = 0.0,
                 anchor_max_x = 1.0,
-                anchor_max_y = 1.0,
+                anchor_max_y = 0.0,
                 pivot_x = 1.0,
                 pivot_y = 1.0,
-                bg = "#7f7f7f"
+                raycast = false
             },
         },
 
@@ -91,8 +111,26 @@ DRH_XP_INFO = {
         end
 
         ShroudShowObject(DRH_XP_INFO.xp_info.panels[1].objectID, UI.Panel)
-    end
+    end,
 
+    update_adventurer_xp = function(amount)
+    end,
+
+    update_producer_xp = function(amount)
+    end,
+
+    ---@type boolean
+    hide_adv_xp_pool = false,
+
+    hide_adv_xp_hourly = false,
+
+    hide_adv_xp_session = false,
+
+    hide_prod_xp_pool = false,
+
+    hide_prod_xp_hourly = false,
+
+    hide_prod_xp_session = false,
 }
 
 function ShroudOnExperienceGain(type, amount)
@@ -213,14 +251,6 @@ function create_xp_panel()
     --ShroudSetAnchorMax(_texts[4].objectID, UI.Text, 0.5, 0.5);
     --ShroudSetPivot(_texts[4].objectID, UI.Text, 0.5, 0.5);       -- set center of our text as our middle
     --ShroudSetTextAlignment(_texts[4].objectID, TextAnchor.MiddleCenter); --set text within the text rect in middle also
-end
-
-function update_adventurer_xp(amount)
-
-end
-
-function update_producer_xp(amount)
-
 end
 
 function notify_ready()

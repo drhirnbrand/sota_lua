@@ -146,7 +146,7 @@ DRH = {
 
             local module_path = ShroudLuaPath .. DRH.DEFAULT_PATH_SEPARATOR .. path_string
 
-            fd = io.open(module_path)
+            fd = io.open(module_path, "r")
 
             if not fd then
                 DRH.errorMessage("library",
@@ -480,9 +480,19 @@ DRH = {
             end
         end,
 
+        ---@param component_specs
         create_panel = function(addOnName, component_specs, component, index)
-            local _panel = {}
-            local _panel_spec = component_specs.panels[index]
+            local name = "<unknown>"
+
+            if (component_specs.panels[index].name) then
+                name = component_specs.panels[index].name
+            end
+
+            DRH.debugMessage(ScriptName .. ":" .. addOnName,
+                string.format("create_panel index %d (%s)", index, name))
+
+            local panel = {}
+            local panel_spec = component_specs.panels[index]
 
             if not component.panels then
                 component.panels = {}
@@ -490,57 +500,111 @@ DRH = {
 
             local _panels = component.panels
 
-            table.insert(_panels, index, _panel)
+            table.insert(_panels, index, panel)
 
-            local objectID = ShroudUIPanel(_panel_spec.x, _panel_spec.y, _panel_spec.w, _panel_spec.h);
-            _panel.objectID = objectID
+            local objectID = ShroudUIPanel(panel_spec.x, panel_spec.y, panel_spec.w, panel_spec.h);
+            panel.objectID = objectID
 
             local x, y = ShroudGetPosition(objectID, UI.Panel)
-            _panel.x = x
-            _panel.y = y
+            panel.x = x
+            panel.y = y
 
-            if _panel_spec.anchor_min_x and _panel_spec.anchor_min_y then
-                ShroudSetAnchorMin(objectID, UI.Panel, _panel_spec.anchor_min_x, _panel_spec.anchor_min_y)
+            if panel_spec.anchor_min_x and panel_spec.anchor_min_y then
+                DRH.debugMessage(ScriptName .. ":" .. addOnName,
+                    string.format("setting min anchor %.02f,%.02f", panel_spec.anchor_min_x, panel_spec.anchor_min_y))
+                ShroudSetAnchorMin(objectID, UI.Panel, panel_spec.anchor_min_x, panel_spec.anchor_min_y)
             end
 
-            if _panel_spec.anchor_max_x and _panel_spec.anchor_max_y then
-                ShroudSetAnchorMin(objectID, UI.Panel, _panel_spec.anchor_max_x, _panel_spec.anchor_max_y)
+            if panel_spec.anchor_max_x and panel_spec.anchor_max_y then
+                DRH.debugMessage(ScriptName .. ":" .. addOnName,
+                    string.format("setting max anchor %.02f,%.02f", panel_spec.anchor_min_x, panel_spec.anchor_min_y))
+                ShroudSetAnchorMin(objectID, UI.Panel, panel_spec.anchor_max_x, panel_spec.anchor_max_y)
             end
 
-            if _panel_spec.pivot_x and _panel_spec.pivot_y then
-                ShroudSetPivot(objectID, UI.Panel, _panel_spec.pivot_x, _panel_spec.pivot_y)
+            if panel_spec.pivot_x and panel_spec.pivot_y then
+                ShroudSetPivot(objectID, UI.Panel, panel_spec.pivot_x, panel_spec.pivot_y)
+                DRH.debugMessage(ScriptName .. ":" .. addOnName,
+                    string.format("setting pivot %.02f,%.02f", panel_spec.pivot_x, panel_spec.pivot_y))
             end
 
-            if _panel_spec.raycast then
-                ShroudRaycastObject(objectID, UI.Panel, _panel_spec.raycast)
+            if panel_spec.raycast then
+                ShroudRaycastObject(objectID, UI.Panel, panel_spec.raycast)
             end
 
-            if _panel_spec.parent_index then
-                local parent_index = _panel_spec.parent_index
+            if panel_spec.parent_index then
+                local parent_index = panel_spec.parent_index
                 local parent_target = _panels[parent_index]
                 if parent_target then
                     local parent_objectID = parent_target.objectID
                     if not parent_objectID or parent_objectID == -1 then
-                        DRH.errorMessage(ScriptName, "parent not yet initialized!")
+                        DRH.errorMessage(ScriptName .. addOnName, "parent not yet initialized!")
                     end
                     ShroudSetParent(objectID, UI.Panel, parent_objectID, UI.Panel)
                 end
             end
 
-            if _panel_spec.bg then
-                ShroudSetColor(objectID, UI.Panel, _panel_spec.bg)
+            if panel_spec.bg then
+                ShroudSetColor(objectID, UI.Panel, panel_spec.bg)
             end
 
-            if _panel_spec.texture_index then
-                local texture_target = component.textures[texture_index]
-                if texture_target then
-                    local texture_objectID = texture_target.objectID
+            if panel_spec.resizable then
+                ShroudSetResizable(objectID, UI.Panel)
+
+                local w_max = 0
+                local h_max = 0
+                local w_min = 0
+                local h_min = 0
+
+                if panel_spec.w_max then
+                    w_max = panel_spec.w_max
+                end
+                if panel_spec.h_max then
+                    h_max = panel_spec.h_max
+                end
+
+                if panel_spec.w_min then
+                    w_min = panel_spec.w_min
+                end
+                if panel_spec.h_min then
+                    h_min = panel_spec.h_min
+                end
+
+                w_max = math.max(panel_spec.w, math.min(w_max, DRH.screen_x))
+                h_max = math.max(panel_spec.h, math.min(h_max, DRH.screen_y))
+
+                ShroudMinMaxSize(objectID, UI.Panel, w_min, w_max, "Horizontal")
+                ShroudMinMaxSize(objectID, UI.Panel, h_min, h_max, "Vertical")
+            end
+
+            if panel_spec.texture_index then
+                local texture_index = panel_spec.texture_index
+                local texture = component.textures[texture_index]
+                if texture then
+                    local texture_objectID = texture.objectID
+
                     if not texture_objectID or texture_objectID == -1 then
-                        DRH.errorMessage(ScriptName, "asset not yet initialized!")
+                        DRH.errorMessage(ScriptName .. addOnName, "asset not yet initialized!")
                     end
+                    DRH.debugMessage(ScriptName .. addOnName,
+                        string.format("create_panel: adding texture %d", texture_objectID))
+
                     ShroudSetParent(texture_objectID, UI.Image, objectID, UI.Panel)
+                    ShroudSetAnchorMin(texture_objectID, UI.Image, 0.0, 0.0)
+                    ShroudSetAnchorMax(texture_objectID, UI.Image, 1.0, 1.0)
+                    ShroudRaycastObject(texture_objectID, UI.Image, false)
                 end
             end
+
+            if panel_spec.children then
+                for _, child in ipairs(panel_spec.children) do
+                    local child_objectID = DRH.ui.create_panel(addOnName, component_specs, component, child)
+                    DRH.debugMessage(ScriptName .. ":" .. addOnName,
+                        string.format("create_panel adding child %d to %d", child_objectID, objectID))
+                    ShroudSetParent(child_objectID, UI.Panel, objectID, UI.Panel)
+                end
+            end
+
+            return objectID
         end
     }
 }
@@ -560,7 +624,7 @@ function ShroudOnSceneLoaded(sceneName)
 end
 
 function ShroudOnConsoleInput(channel, sender, message)
-    DRH.debugMessage(ScriptName, "console input: (sender: " .. sender .. ") " .. message)
+    ---    DRH.debugMessage(ScriptName, "console input: (sender: " .. sender .. ") " .. message)
 end
 
 function ShroudOnUpdate()
